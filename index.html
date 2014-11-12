@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head lang="ja">
+<meta charset="UTF-8"/>
+<title>差分抽出→スプライトシート出力 v0.2.0</title>
+<link rel="stylesheet" href="assets/css/style.css"/>
+<script src="assets/js/underscore-min.js"></script>
+<script src="assets/js/vue.min.js"></script>
+<script src="assets/js/spin.min.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>差分抽出→スプライトシート出力 v0.2.0</h1>
+  <p>連番の画像ファイルからスプライトシートを生成します。</p>
+</header>
+
+<main id="app">
+
+  <section class="uploader" v-component="uploader" v-show="mode === 'upload'" v-ref="uploader"><div>
+    <h2 class="uploader__heading">1. 画像選択</h2>
+    <div class="uploader__drop" dropzone="copy" v-on="drop: onDrop, dragover: onDragOver">ここに画像をドラッグ＆ドロップする</div>
+  </div></section>
+
+  <section class="arranger" v-component="arranger" v-show="mode === 'arrange'" v-ref="arranger"><div>
+    <h2 class="arranger__heading">2. キーフレームの選択 <button class="arranger__heading__back" type="button" v-on="click: back">戻る</button></h2>
+    <dl class="arranger__values">
+      <dt><label for="arranger__frames-per-sheet">シートあたりのフレーム数</label></dt>
+      <dd><input class="input-text" id="arranger__frames-per-sheet" type="number" min="1" v-model="fps" number/></dd>
+      <dt><label for="arranger__keyframes">キーフレーム</label></dt>
+      <dd><input class="input-text" id="arranger__keyframes" type="text" size="30" v-model="keyframes" v-on="blur: refreshFiles"/></dd>
+    </dl>
+    <p class="arranger__generate"><button class="arranger__generate__button" type="button" v-on="click: generate">スプライト生成</button></p>
+    <div class="sheets"><div>
+      <div class="sheet" v-repeat="sheets">
+        <div class="sheet__number">Sheet {{ $index }}</div>
+        <ul class="files">
+          <li class="file" v-repeat="files" v-component="file" v-class="keyframe ? 'file--keyframe' : ''" v-on="click: keyframe = !keyframe"><img v-attr="src: src" alt=""/></li>
+        </ul>
+      </div>
+    </div></div>
+  </div></section>
+
+  <section class="result" v-component="result" v-show="mode === 'result'" v-ref="result"><div>
+    <h2 class="result__heading">3. 出力結果 <button class="result__heading__back" type="button" v-on="click: back">戻る</button></h2>
+    <p class="result__progress" v-show="generating">出力しています……</p>
+    <p class="result__progress" v-show="!generating">完了しました！</p>
+    <div class="sheets"><div>
+      <div class="sheet" v-repeat="sheets">
+        <div class="sheet__number">Sheet {{ $index }}</div>
+        <div class="result__output"></div>
+      </div>
+    </div></div>
+  </div></section>
+
+</main>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>
